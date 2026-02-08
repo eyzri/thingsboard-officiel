@@ -53,9 +53,10 @@ jobs:
         env:
           MAVEN_OPTS: -Xmx2048m
           NODE_OPTIONS: --max_old_space_size=4096
+          SUREFIRE_JAVA_OPTS: -Xmx1200m -Xss256k -XX:+ExitOnOutOfMemoryError
         run: |
           mvn -T 2 license:format clean install -DskipTests
-          mvn test -pl '!application,!dao,!ui-ngx,!msa/js-executor,!msa/web-ui' -T 2 -B
+          mvn test -pl '!application,!dao,!ui-ngx,!msa/js-executor,!msa/web-ui' -T 1 -B
 
       - name: Install ThingsBoard (create tables, load demo)
         env:
