@@ -1,0 +1,93 @@
+#
+# Pipeline d'intégration continue pour ThingsBoard
+# - Compilation du projet et exécution des tests unitaires
+# - Lancement de ThingsBoard et vérification
+#
+
+name: CI - Build, Test & Run ThingsBoard
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+  pull_request:
+    branches:
+      - master
+      - main
+      - develop
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: thingsboard
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Build and Run Unit Tests
+        env:
+          MAVEN_OPTS: -Xmx2048m
+          NODE_OPTIONS: --max_old_space_size=4096
+        run: |
+          mvn -T 2 license:format clean install -DskipTests
+          mvn test -pl '!application,!dao,!ui-ngx,!msa/js-executor,!msa/web-ui' -T 2 -B
+
+      - name: Install ThingsBoard (create tables, load demo)
+        env:
+          MAVEN_OPTS: -Xmx1024m
+        run: |
+          java -cp application/target/thingsboard-4.4.0-SNAPSHOT-boot.jar \
+            -Dloader.main=org.thingsboard.server.ThingsboardInstallApplication \
+            -Dinstall.data_dir=application/target/data \
+            -Dinstall.load_demo=true \
+            -Dspring.jpa.hibernate.ddl-auto=none \
+            -Dinstall.upgrade=false \
+            -Dspring.datasource.url=jdbc:postgresql://localhost:5432/thingsboard \
+            -Dspring.datasource.username=postgres \
+            -Dspring.datasource.password=postgres \
+            org.springframework.boot.loader.launch.PropertiesLauncher
+
+      - name: Start ThingsBoard
+        env:
+          JAVA_TOOL_OPTIONS: -Xmx1536m
+        run: |
+          java -jar application/target/thingsboard-4.4.0-SNAPSHOT-boot.jar \
+            --spring.datasource.url=jdbc:postgresql://localhost:5432/thingsboard \
+            --spring.datasource.username=postgres \
+            --spring.datasource.password=postgres &
+          echo "Waiting for ThingsBoard to start..."
+          for i in $(seq 1 60); do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login 2>/dev/null | grep -q "200\|302"; then
+              echo "ThingsBoard is ready!"
+              curl -s -o /dev/null -w "HTTP %{http_code}" http://localhost:8080/login
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Timeout: ThingsBoard did not start in time"
+          exit 1
