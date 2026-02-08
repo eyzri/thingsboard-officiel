@@ -26,6 +26,9 @@ on:
 jobs:
   license-format:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      workflows: write
 
     steps:
       - name: Checkout Repository
