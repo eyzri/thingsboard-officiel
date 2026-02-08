@@ -55,7 +55,7 @@ jobs:
           NODE_OPTIONS: --max_old_space_size=4096
         run: |
           mvn -T 2 license:format clean install -DskipTests
-          mvn test -pl '!application,!dao,!ui-ngx,!msa/js-executor,!msa/web-ui,!org.thingsboard.common.script:script-api' -T 2 -B
+          mvn test -pl '!application,!dao,!ui-ngx,!msa/js-executor,!msa/web-ui' -T 2 -B
 
       - name: Install ThingsBoard (create tables, load demo)
         env:
