@@ -194,7 +194,7 @@ public class AuthControllerTest extends AbstractControllerTest {
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string(HttpHeaders.LOCATION, "/login/resetPassword?resetToken=" + this.currentResetPasswordToken));
 
-        String newPassword = RandomStringUtils.randomAlphanumeric(73);
+        String newPassword = "Aa1!" + RandomStringUtils.randomAlphanumeric(69);
         JsonNode resetPasswordRequest = JacksonUtil.newObjectNode()
                 .put("resetToken", this.currentResetPasswordToken)
                 .put("password", newPassword);

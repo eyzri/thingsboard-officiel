@@ -144,7 +144,28 @@ public class DefaultSystemSecurityService implements SystemSecurityService {
     }
 
     @Override
+    public boolean isStrongPassword(String password) {
+        if (password == null || password.length() < 6) {
+            return false;
+        }
+        boolean hasUppercase = false;
+        boolean hasLowercase = false;
+        boolean hasDigit = false;
+        boolean hasSpecial = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUppercase = true;
+            else if (Character.isLowerCase(c)) hasLowercase = true;
+            else if (Character.isDigit(c)) hasDigit = true;
+            else if (!Character.isLetterOrDigit(c)) hasSpecial = true;
+        }
+        return hasUppercase && hasLowercase && hasDigit && hasSpecial;
+    }
+
+    @Override
     public void validatePassword(String password, UserCredentials userCredentials) throws DataValidationException {
+        if (!isStrongPassword(password)) {
+            throw new DataValidationException("Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
+        }
         SecuritySettings securitySettings = securitySettingsService.getSecuritySettings();
         UserPasswordPolicy passwordPolicy = securitySettings.getPasswordPolicy();
 

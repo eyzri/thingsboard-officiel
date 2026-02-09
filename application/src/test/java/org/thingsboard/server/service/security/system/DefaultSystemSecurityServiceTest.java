@@ -35,9 +35,11 @@ import org.thingsboard.server.dao.audit.AuditLogService;
 import org.thingsboard.server.dao.settings.AdminSettingsService;
 import org.thingsboard.server.dao.settings.SecuritySettingsService;
 import org.thingsboard.server.dao.user.UserService;
+import org.thingsboard.server.exception.DataValidationException;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -90,6 +92,33 @@ public class DefaultSystemSecurityServiceTest {
         securitySettings = new SecuritySettings();
         securitySettings.setMaxFailedLoginAttempts(5);
         securitySettings.setPasswordPolicy(new UserPasswordPolicy());
+    }
+
+    @Test
+    public void testIsStrongPassword_validPassword() {
+        assertThat(systemSecurityService.isStrongPassword("Test123!")).isTrue();
+        assertThat(systemSecurityService.isStrongPassword("MyP@ssw0rd")).isTrue();
+        assertThat(systemSecurityService.isStrongPassword("Aa1!bc")).isTrue();
+    }
+
+    @Test
+    public void testIsStrongPassword_weakPasswords() {
+        assertThat(systemSecurityService.isStrongPassword(null)).isFalse();
+        assertThat(systemSecurityService.isStrongPassword("")).isFalse();
+        assertThat(systemSecurityService.isStrongPassword("12345")).isFalse();
+        assertThat(systemSecurityService.isStrongPassword("abcdef")).isFalse();
+        assertThat(systemSecurityService.isStrongPassword("ABCDEF")).isFalse();
+        assertThat(systemSecurityService.isStrongPassword("Abc123")).isFalse();
+        assertThat(systemSecurityService.isStrongPassword("Abc!!!")).isFalse();
+    }
+
+    @Test
+    public void testValidatePassword_rejectsWeakPassword() {
+        when(securitySettingsService.getSecuritySettings()).thenReturn(securitySettings);
+
+        assertThatThrownBy(() -> systemSecurityService.validatePassword("weak", null))
+                .isInstanceOf(DataValidationException.class)
+                .hasMessageContaining("at least one uppercase letter");
     }
 
     @Test

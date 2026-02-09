@@ -100,7 +100,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class EntityQueryControllerTest extends AbstractControllerTest {
 
     private static final String CUSTOMER_USER_EMAIL = "entityQueryCustomer@thingsboard.org";
-    private static final String TENANT_PASSWORD = "testPassword1";
+    private static final String TENANT_PASSWORD = "testPassword1!";
     private static final String CUSTOMER_USER_PASSWORD = "customer";
     private static final String TENANT_EMAIL = "entityQueryTenant@thingsboard.org";
 

@@ -132,7 +132,7 @@ public class UserControllerTest extends AbstractControllerTest {
 
         JsonNode activateRequest = JacksonUtil.newObjectNode()
                 .put("activateToken", this.currentActivateToken)
-                .put("password", "testPassword");
+                .put("password", "testPassword1!");
 
         JsonNode tokenInfo = readResponse(doPost("/api/noauth/activate", activateRequest).andExpect(status().isOk()), JsonNode.class);
         validateAndSetJwtToken(tokenInfo, email);
@@ -144,7 +144,7 @@ public class UserControllerTest extends AbstractControllerTest {
 
         resetTokens();
 
-        login(email, "testPassword");
+        login(email, "testPassword1!");
 
         doGet("/api/auth/user")
                 .andExpect(status().isOk())
@@ -198,7 +198,7 @@ public class UserControllerTest extends AbstractControllerTest {
         loginSysAdmin();
 
         User tenantAdmin = createTenantAdminUser();
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1!");
 
         loginDifferentTenant();
 
@@ -219,7 +219,7 @@ public class UserControllerTest extends AbstractControllerTest {
 
         User user = createTenantAdminUser();
         String email = user.getEmail();
-        User savedUser = createUserAndLogin(user, "testPassword1");
+        User savedUser = createUserAndLogin(user, "testPassword1!");
         resetTokens();
 
         JsonNode resetPasswordByEmailRequest = JacksonUtil.newObjectNode()
@@ -234,7 +234,7 @@ public class UserControllerTest extends AbstractControllerTest {
 
         JsonNode resetPasswordRequest = JacksonUtil.newObjectNode()
                 .put("resetToken", this.currentResetPasswordToken)
-                .put("password", "testPassword2");
+                .put("password", "testPassword2!");
 
         Mockito.doNothing().when(mailService).sendPasswordWasResetEmail(anyString(), anyString());
         doPost("/api/noauth/resetPassword", resetPasswordRequest)
@@ -243,7 +243,7 @@ public class UserControllerTest extends AbstractControllerTest {
 
         resetTokens();
 
-        login(email, "testPassword2");
+        login(email, "testPassword2!");
         doGet("/api/auth/user")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.authority", is(Authority.TENANT_ADMIN.name())))
@@ -590,7 +590,7 @@ public class UserControllerTest extends AbstractControllerTest {
         loginSysAdmin();
 
         User tenantAdmin = createTenantAdminUser();
-        createUserAndLogin(tenantAdmin, "testPassword1");
+        createUserAndLogin(tenantAdmin, "testPassword1!");
 
         CustomerId customerId = postCustomer();
 
@@ -630,7 +630,7 @@ public class UserControllerTest extends AbstractControllerTest {
         loginSysAdmin();
 
         User tenantAdmin = createTenantAdminUser();
-        createUserAndLogin(tenantAdmin, "testPassword1");
+        createUserAndLogin(tenantAdmin, "testPassword1!");
 
         CustomerId customerId = postCustomer();
 
@@ -985,7 +985,7 @@ public class UserControllerTest extends AbstractControllerTest {
 
         loginSysAdmin();
         User tenantAdmin = createTenantAdminUser(searchText, "Brown");
-        createUserAndLogin(tenantAdmin, "testPassword1");
+        createUserAndLogin(tenantAdmin, "testPassword1!");
 
         CustomerId customerId2 = postCustomer();
         User user = createCustomerUser(searchText, "Downs", customerId2);
@@ -993,7 +993,7 @@ public class UserControllerTest extends AbstractControllerTest {
 
         CustomerId customerId3 = postCustomer();
         User user2 = createCustomerUser(customerId3);
-        createUserAndLogin(user2, "testPassword2");
+        createUserAndLogin(user2, "testPassword2!");
 
         PageLink pageLink = new PageLink(10, 0, searchText);
         List<UserEmailInfo> usersInfo = getUsersInfo(pageLink);
@@ -1004,7 +1004,7 @@ public class UserControllerTest extends AbstractControllerTest {
         loginDifferentTenant();
         doDelete("/api/customer/" + customerId1.getId().toString())
                 .andExpect(status().isOk());
-        loginUser(tenantAdmin.getEmail(), "testPassword1");
+        loginUser(tenantAdmin.getEmail(), "testPassword1!");
         doDelete("/api/customer/" + customerId2.getId().toString())
                 .andExpect(status().isOk());
         doDelete("/api/customer/" + customerId3.getId().toString())
@@ -1015,7 +1015,7 @@ public class UserControllerTest extends AbstractControllerTest {
     public void shouldFindCustomerUsersBySearchText() throws Exception {
         loginSysAdmin();
         User tenantAdmin = createTenantAdminUser();
-        createUserAndLogin(tenantAdmin, "testPassword1");
+        createUserAndLogin(tenantAdmin, "testPassword1!");
 
         String searchText = "Philip";
 
@@ -1035,7 +1035,7 @@ public class UserControllerTest extends AbstractControllerTest {
             doPost("/api/user", createCustomerUser(null, null, searchText + suffix + "@thingsboard.org", customerId2), User.class);
         }
 
-        createUserAndLogin(createCustomerUser(customerId), "testPassword2");
+        createUserAndLogin(createCustomerUser(customerId), "testPassword2!");
 
         // find users by search text
         PageLink pageLink = new PageLink(10, 0, searchText);
@@ -1055,7 +1055,7 @@ public class UserControllerTest extends AbstractControllerTest {
         Assert.assertEquals(1, usersInfo.size());
 
         //clear users
-        loginUser(tenantAdmin.getEmail(), "testPassword1");
+        loginUser(tenantAdmin.getEmail(), "testPassword1!");
         doDelete("/api/customer/" + customerId.getId().toString())
                 .andExpect(status().isOk());
         doDelete("/api/customer/" + customerId2.getId().toString())
@@ -1067,7 +1067,7 @@ public class UserControllerTest extends AbstractControllerTest {
         loginSysAdmin();
 
         User tenantAdmin = createTenantAdminUser();
-        createUserAndLogin(tenantAdmin, "testPassword1");
+        createUserAndLogin(tenantAdmin, "testPassword1!");
         CustomerId customerId = postCustomer();
         CustomerId customerId2 = postCustomer();
 
@@ -1090,7 +1090,7 @@ public class UserControllerTest extends AbstractControllerTest {
         doPost("/api/user", createCustomerUser("Jane", searchText, customerId3), User.class);
 
         // find users by search text
-        loginUser(tenantAdmin.getEmail(), "testPassword1");
+        loginUser(tenantAdmin.getEmail(), "testPassword1!");
         PageLink pageLink = new PageLink(10, 0, searchText);
         List<UserEmailInfo> usersInfo = getUsersInfo(pageLink);
 
