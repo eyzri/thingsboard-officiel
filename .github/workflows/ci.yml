@@ -56,7 +56,7 @@ jobs:
           SUREFIRE_JAVA_OPTS: -Xmx1200m -Xss256k -XX:+ExitOnOutOfMemoryError
         run: |
           mvn -T 2 license:format clean install -DskipTests
-          mvn test -pl '!application,!dao,!ui-ngx,!msa/js-executor,!msa/web-ui' -T 1 -B -Dskip.script-api.tests=true
+          mvn test -pl '!application,!dao,!ui-ngx,!msa/js-executor,!msa/web-ui,!common/script/script-api' -T 1 -B
 
       - name: Install ThingsBoard (create tables, load demo)
         env:
